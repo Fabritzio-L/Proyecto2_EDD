@@ -131,26 +131,106 @@ class NodoCapa {
 public:
     int idCapa;
     MatrizDispersa* pixeles; 
-    NodoCapa *izq;
-    NodoCapa *der;
+    NodoCapa *left;
+    NodoCapa *right;
 
     NodoCapa(int id) {
         idCapa = id;
         pixeles = new MatrizDispersa();
-        izq = der = nullptr;
+        left = right = nullptr;
     }
 };
 
-class ABBCapas {
-public:
-    NodoCapa* raiz;
+class BSTCapas {
+private:
+    NodoCapa* root;
 
-    ABBCapas() { raiz = nullptr; }
+    NodoCapa* insert(NodoCapa* node, int id) {
+        if (node == nullptr) {
+            cout << "Capa " << id << " agregada al BST." << endl;
+            return new NodoCapa(id);
+        }
 
-    void insertarCapa(int id) {
+        if (id < node->idCapa) {
+            node->left = insert(node->left, id);
+        }
+        else if (id > node->idCapa) {
+            node->right = insert(node->right, id);
+        }
+        else {
+            cout << "Atencion: La capa con id " << id << " ya existe." << endl;
+        }
+        return node;
     }
 
-    NodoCapa* buscarCapa(int id) {
-        return nullptr;
+    NodoCapa* search(NodoCapa* node, int id) {
+        if (node == nullptr || node->idCapa == id) {
+            return node;
+        }
+
+        if (id < node->idCapa) {
+            return search(node->left, id);
+        }
+        return search(node->right, id);
+    }
+
+    // Raiz, izquierda, cerecha
+    void preorden(NodoCapa* node) {
+        if (node == nullptr) 
+            return; 
+
+        cout << "Capa ID: " << node->idCapa << endl;
+
+        preorden(node->left);
+        preorden(node->right);
+    }
+
+    // Izquierda, raiz, derecha
+    void inorden(NodoCapa* node) {
+        if (node == nullptr) return;
+
+        inorden(node->left);
+
+        cout << "Capa ID: " << node->idCapa << endl;
+
+        inorden(node->right);
+    }
+
+    // Izquierda, derecha, raiz
+    void postorden(NodoCapa* node) {
+        if (node == nullptr) return;
+
+        postorden(node->left);  
+        postorden(node->right); 
+
+        cout << "Capa ID: " << node->idCapa << endl;
+    }
+
+public:
+    BSTCapas() {
+        root = nullptr;
+    }
+
+    void insert(int id) {
+        root = insert(root, id);
+    }
+
+    NodoCapa* search(int id) {
+        return search(root, id);
+    }
+
+    void preorden() {
+        preorden(root);
+        cout << endl;
+    }
+
+    void inorden() {
+        inorden(root);
+        cout << endl;
+    }
+
+    void postorden() {
+        postorden(root);
+        cout << endl;
     }
 };
