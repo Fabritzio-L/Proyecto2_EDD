@@ -28,3 +28,126 @@ struct NodoImagen {
     anterior = nullptr;
     }
 };
+
+class ListaCircularImagenes {
+private:
+    NodoImagen* cabeza;
+
+public:
+    ListaCircularImagenes() {
+        cabeza = nullptr;
+    }
+
+    void insertarImagen(int id) {
+        NodoImagen* nuevo = new NodoImagen(id);
+
+        if (cabeza == nullptr) {
+            cabeza = nuevo;
+            cabeza->siguiente = cabeza;
+            cabeza->anterior = cabeza;
+            cout << "Imagen " << id << " insertada como cabeza." << endl;
+            return;
+        }
+
+        // Buscar si existe para evitar duplicados 
+        NodoImagen* aux = cabeza;
+        do {
+            if (aux->idImagen == id) {
+                cout << "Error: La imagen " << id << " ya existe." << endl;
+                return;
+            }
+            aux = aux->siguiente;
+        } while (aux != cabeza);
+
+        // Insercion 
+        aux = cabeza;
+        
+        if (id < cabeza->idImagen) {
+            NodoImagen* ultimo = cabeza->anterior;
+            
+            nuevo->siguiente = cabeza;
+            nuevo->anterior = ultimo;
+            cabeza->anterior = nuevo;
+            ultimo->siguiente = nuevo;
+            
+            cabeza = nuevo; 
+        } 
+        else {
+            while (aux->siguiente != cabeza && aux->siguiente->idImagen < id) {
+                aux = aux->siguiente;
+            }
+            
+            nuevo->siguiente = aux->siguiente;
+            nuevo->anterior = aux;
+            aux->siguiente->anterior = nuevo;
+            aux->siguiente = nuevo;
+        }
+        cout << "Imagen " << id << " insertada en la lista circular." << endl;
+    }
+
+    NodoImagen* buscarImagen(int id) {
+        if (cabeza == nullptr) return nullptr;
+
+        NodoImagen* aux = cabeza;
+        do {
+            if (aux->idImagen == id) {
+                return aux;
+            }
+            aux = aux->siguiente;
+        } while (aux != cabeza);
+
+        return nullptr;
+    }
+
+    void agregarCapaAImagen(int idImagen, NodoCapa* capaRef) {
+        if (capaRef == nullptr) {
+             cout << "Error: La capa referenciada no existe en el BST." << endl;
+             return;
+        }
+
+        NodoImagen* img = buscarImagen(idImagen);
+        if (img == nullptr) {
+            cout << "Error: La imagen " << idImagen << " no existe." << endl;
+            return;
+        }
+
+        NodoCapaImagen* nuevaCapa = new NodoCapaImagen(capaRef);
+
+        if (img->cabezaCapas == nullptr) {
+            img->cabezaCapas = nuevaCapa;
+        } else {
+            NodoCapaImagen* aux = img->cabezaCapas;
+            while (aux->siguiente != nullptr) {
+                aux = aux->siguiente;
+            }
+            aux->siguiente = nuevaCapa;
+        }
+        cout << "Capa " << capaRef->idCapa << " agregada a la imagen " << idImagen << "." << endl;
+    }
+
+    void mostrarImagenes() {
+        if (cabeza == nullptr) {
+            cout << "Lista de imagenes vacia." << endl;
+            return;
+        }
+
+        NodoImagen* aux = cabeza;
+        cout << "\n--- LISTA CIRCULAR DE IMAGENES ---" << endl;
+        do {
+            cout << "Imagen ID: " << aux->idImagen << " | Capas: ";
+            
+            NodoCapaImagen* auxCapa = aux->cabezaCapas;
+            if (auxCapa == nullptr) {
+                cout << "Ninguna";
+            }
+            while (auxCapa != nullptr) {
+                cout << "[" << auxCapa->capaPuntero->idCapa << "] ";
+                auxCapa = auxCapa->siguiente;
+            }
+            cout << endl;
+
+            aux = aux->siguiente;
+        } while (aux != cabeza);
+        cout << "----------------------------------\n" << endl;
+    }
+};
