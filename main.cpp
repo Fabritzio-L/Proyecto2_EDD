@@ -19,7 +19,16 @@ int main() {
     arbolUsuarios.graficarArbolUsuarios();
     arbolCapas.graficarArbolCapas();
     listaImagenes.graficarListaImagenes();
-
+    
+    cout << "\n--- GENERANDO REPORTE DE CAPA (MATRIZ DISPERSA) ---" << endl;
+    
+    NodoCapa* capaAGraficar = arbolCapas.search(101);
+    
+    if (capaAGraficar != nullptr) {
+        capaAGraficar->pixeles->graficarCapa(101);
+    } else {
+        cout << "La capa 101 no existe en el sistema." << endl;
+    }
     
     return 0;
 }

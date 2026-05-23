@@ -127,6 +127,96 @@ public:
             cout << endl;
         }
     }
+    void graficarCapa(int idCapa) {
+        ofstream archivo("capa_" + to_string(idCapa) + ".dot");
+        if (!archivo.is_open()) {
+            cout << "Error: No se pudo crear el archivo dot de la capa." << endl;
+            return;
+        }
+
+        archivo << "digraph MatrizCapa_" << idCapa << " {\n";
+        archivo << "    node [shape=box, style=filled, fillcolor=white];\n";
+        archivo << "    rankdir=TB;\n"; 
+
+        archivo << "    Raiz [label=\"Matriz\", fillcolor=darkgray];\n";
+
+        Cabecera* auxCol = columnaCabeceraRaiz;
+        if (auxCol != nullptr) {
+            archivo << "    Raiz -> Col_" << auxCol->indice << ";\n";
+            while (auxCol != nullptr) {
+                archivo << "    Col_" << auxCol->indice << " [label=\"" << auxCol->indice << "\", fillcolor=lightgray];\n";
+                if (auxCol->siguiente != nullptr) {
+                    archivo << "    Col_" << auxCol->indice << " -> Col_" << auxCol->siguiente->indice << ";\n";
+                }
+                auxCol = auxCol->siguiente;
+            }
+            archivo << "    { rank=same; Raiz; ";
+            auxCol = columnaCabeceraRaiz;
+            while (auxCol != nullptr) {
+                archivo << "Col_" << auxCol->indice << "; ";
+                auxCol = auxCol->siguiente;
+            }
+            archivo << "}\n";
+        }
+
+        Cabecera* auxFila = filaCabeceraRaiz;
+        if (auxFila != nullptr) {
+            archivo << "    Raiz -> Fila_" << auxFila->indice << ";\n";
+        }
+        
+        while (auxFila != nullptr) {
+            archivo << "    Fila_" << auxFila->indice << " [label=\"" << auxFila->indice << "\", fillcolor=lightgray];\n";
+            if (auxFila->siguiente != nullptr) {
+                archivo << "    Fila_" << auxFila->indice << " -> Fila_" << auxFila->siguiente->indice << ";\n";
+            }
+
+            NodoMatriz* auxNodo = auxFila->primerNodo;
+            if (auxNodo != nullptr) {
+                archivo << "    Fila_" << auxFila->indice << " -> Nodo_" << auxNodo->fila << "_" << auxNodo->columna << ";\n";
+            }
+
+            while (auxNodo != nullptr) {
+                archivo << "    Nodo_" << auxNodo->fila << "_" << auxNodo->columna 
+                        << " [label=\"" << auxNodo->color << "\", fillcolor=\"" << auxNodo->color << "\"];\n";
+                
+                if (auxNodo->derecha != nullptr) {
+                    archivo << "    Nodo_" << auxNodo->fila << "_" << auxNodo->columna << " -> Nodo_" << auxNodo->derecha->fila << "_" << auxNodo->derecha->columna << ";\n";
+                }
+                auxNodo = auxNodo->derecha;
+            }
+
+            archivo << "    { rank=same; Fila_" << auxFila->indice << "; ";
+            auxNodo = auxFila->primerNodo;
+            while (auxNodo != nullptr) {
+                archivo << "Nodo_" << auxNodo->fila << "_" << auxNodo->columna << "; ";
+                auxNodo = auxNodo->derecha;
+            }
+            archivo << "}\n";
+
+            auxFila = auxFila->siguiente;
+        }
+
+        auxCol = columnaCabeceraRaiz;
+        while (auxCol != nullptr) {
+            NodoMatriz* auxNodo = auxCol->primerNodo;
+            if (auxNodo != nullptr) {
+                archivo << "    Col_" << auxCol->indice << " -> Nodo_" << auxNodo->fila << "_" << auxNodo->columna << ";\n";
+                while (auxNodo->abajo != nullptr) {
+                    archivo << "    Nodo_" << auxNodo->fila << "_" << auxNodo->columna << " -> Nodo_" << auxNodo->abajo->fila << "_" << auxNodo->abajo->columna << ";\n";
+                    auxNodo = auxNodo->abajo;
+                }
+            }
+            auxCol = auxCol->siguiente;
+        }
+
+        archivo << "}\n";
+        archivo.close();
+
+        string comando = "dot -Tpng capa_" + to_string(idCapa) + ".dot -o capa_" + to_string(idCapa) + ".png";
+        system(comando.c_str());
+
+        cout << "¡Exito! Se genero el grafico de la matriz para la Capa " << idCapa << " en la carpeta." << endl;
+    }
 };
 
 class NodoCapa {
