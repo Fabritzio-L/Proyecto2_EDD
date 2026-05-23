@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <fstream>
 #include "capas.cpp" 
 using namespace std;
 
@@ -150,5 +151,65 @@ public:
             aux = aux->siguiente;
         } while (aux != cabeza);
         cout << "----------------------------------\n" << endl;
+    }
+    void graficarListaImagenes() {
+        if (cabeza == nullptr) {
+            cout << "La lista de imagenes esta vacia." << endl;
+            return;
+        }
+
+        ofstream archivo("lista_imagenes.dot");
+        if (!archivo.is_open()) {
+            cout << "Error: No se pudo crear el archivo dot para imagenes." << endl;
+            return;
+        }
+
+        archivo << "digraph ListaImagenes {\n";
+        archivo << "    rankdir=LR;\n"; // Left to Right (De izquierda a derecha)
+        archivo << "    node [shape=record, style=filled, fillcolor=lightyellow];\n\n";
+
+        archivo << "    { rank=same;\n";
+        NodoImagen* aux = cabeza;
+        do {
+            archivo << "        \"Img_" << aux->idImagen << "\" [label=\"{ <ant> | Imagen " << aux->idImagen << " | <sig> }\"];\n";
+            aux = aux->siguiente;
+        } while (aux != cabeza);
+        archivo << "    }\n\n";
+
+        aux = cabeza;
+        do {
+            archivo << "    \"Img_" << aux->idImagen << "\":sig -> \"Img_" << aux->siguiente->idImagen << "\":ant;\n";
+            
+            archivo << "    \"Img_" << aux->idImagen << "\":ant -> \"Img_" << aux->anterior->idImagen << "\":sig;\n";
+            
+            aux = aux->siguiente;
+        } while (aux != cabeza);
+
+        aux = cabeza;
+        do {
+            NodoCapaImagen* auxCapa = aux->cabezaCapas;
+            if (auxCapa != nullptr) {
+                archivo << "    \"CapaImg_" << aux->idImagen << "_" << auxCapa->capaPuntero->idCapa 
+                        << "\" [label=\"Capa " << auxCapa->capaPuntero->idCapa << "\", shape=box, fillcolor=lightgrey];\n";
+                archivo << "    \"Img_" << aux->idImagen << "\" -> \"CapaImg_" << aux->idImagen << "_" << auxCapa->capaPuntero->idCapa << "\";\n";
+
+                while (auxCapa->siguiente != nullptr) {
+                    archivo << "    \"CapaImg_" << aux->idImagen << "_" << auxCapa->siguiente->capaPuntero->idCapa 
+                            << "\" [label=\"Capa " << auxCapa->siguiente->capaPuntero->idCapa << "\", shape=box, fillcolor=lightgrey];\n";
+                    archivo << "    \"CapaImg_" << aux->idImagen << "_" << auxCapa->capaPuntero->idCapa 
+                            << "\" -> \"CapaImg_" << aux->idImagen << "_" << auxCapa->siguiente->capaPuntero->idCapa << "\";\n";
+                    
+                    auxCapa = auxCapa->siguiente;
+                }
+            }
+            aux = aux->siguiente;
+        } while (aux != cabeza);
+
+        archivo << "}\n";
+        archivo.close();
+
+        system("dot -Tpng lista_imagenes.dot -o lista_imagenes.png");
+        
+        cout << "¡Exito! Se genero la imagen lista_imagenes.png en la carpeta del proyecto." << endl;
     }
 };

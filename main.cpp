@@ -18,7 +18,7 @@ int main() {
     cout << "\n--- GENERANDO REPORTES VISUALES ---" << endl;
     arbolUsuarios.graficarArbolUsuarios();
     arbolCapas.graficarArbolCapas();
-
+    listaImagenes.graficarListaImagenes();
 
     
     return 0;
