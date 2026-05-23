@@ -140,4 +140,48 @@ public:
             aux->siguiente = nuevoNodo;
         }
     }
+private:
+    void generarDotUsuarios(NodoUsuario* node, ofstream& archivo) {
+        if (node == nullptr) return;
+
+        archivo << "    \"" << node->nombreUsuario << "\" [label=\"" << node->nombreUsuario << "\", shape=box, style=filled, fillcolor=lightblue];\n";
+
+        if (node->left != nullptr) {
+            archivo << "    \"" << node->nombreUsuario << "\" -> \"" << node->left->nombreUsuario << "\";\n";
+            generarDotUsuarios(node->left, archivo);
+        }
+        
+        if (node->right != nullptr) {
+            archivo << "    \"" << node->nombreUsuario << "\" -> \"" << node->right->nombreUsuario << "\";\n";
+            generarDotUsuarios(node->right, archivo);
+        }
+    }
+
+public:
+    void graficarArbolUsuarios() {
+        if (root == nullptr) {
+            cout << "El arbol de usuarios esta vacio." << endl;
+            return;
+        }
+
+        ofstream archivo("arbol_usuarios.dot");
+        if (!archivo.is_open()) {
+            cout << "Error: No se pudo crear el archivo dot." << endl;
+            return;
+        }
+
+        archivo << "digraph ArbolUsuarios {\n";
+        archivo << "    rankdir=TB;\n"; 
+
+        generarDotUsuarios(root, archivo);
+
+        archivo << "}\n";
+        archivo.close();
+
+        system("dot -Tpng arbol_usuarios.dot -o arbol_usuarios.png");
+        
+        cout << "¡Exito! Se genero la imagen arbol_usuarios.png en la carpeta del proyecto." << endl;
+        
+        // system("arbol_usuarios.png"); 
+    }
 };

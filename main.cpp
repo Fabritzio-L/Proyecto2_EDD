@@ -15,6 +15,10 @@ int main() {
 
     listaImagenes.mostrarImagenes();
 
+    cout << "\n--- GENERANDO REPORTES VISUALES ---" << endl;
+    arbolUsuarios.graficarArbolUsuarios();
+
+
     
     return 0;
 }
