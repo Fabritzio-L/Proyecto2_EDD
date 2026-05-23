@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <string>
 #include <iomanip>
@@ -233,4 +234,4 @@ public:
         postorden(root);
         cout << endl;
     }
-};
+}; 

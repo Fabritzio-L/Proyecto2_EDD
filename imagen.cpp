@@ -1,5 +1,6 @@
+#pragma once
 #include <iostream>
-#include "Capas.cpp" 
+#include "capas.cpp" 
 using namespace std;
 
 
