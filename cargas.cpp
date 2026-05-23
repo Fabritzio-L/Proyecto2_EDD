@@ -121,3 +121,47 @@ void cargarArchivoImagenes(string ruta, ListaCircularImagenes& listaImg, BSTCapa
     archivo.close();
     cout << "--- CARGA DE IMAGENES FINALIZADA EXITOSAMENTE ---\n" << endl;
 }
+void cargarArchivoUsuarios(string ruta, BSTUsuarios& arbolUsuarios) {
+    ifstream archivo(ruta);
+    if (!archivo.is_open()) {
+        cout << "Error: No se pudo abrir el archivo de usuarios: " << ruta << endl;
+        return;
+    }
+
+    string linea;
+    cout << "\n--- INICIANDO CARGA MASIVA DE USUARIOS ---" << endl;
+
+    while (getline(archivo, linea)) {
+        if (linea.empty()) continue;
+
+        size_t posDosPuntos = linea.find(':');
+        size_t posPuntoComa = linea.find(';');
+
+        if (posDosPuntos != string::npos && posPuntoComa != string::npos) {
+            try {
+                string nombre = linea.substr(0, posDosPuntos);
+                
+                arbolUsuarios.insert(nombre);
+
+                string strImagenes = linea.substr(posDosPuntos + 1, posPuntoComa - posDosPuntos - 1);
+                
+                if (!strImagenes.empty()) {
+                    stringstream ss(strImagenes);
+                    string tokenImg;
+                    
+                    while (getline(ss, tokenImg, ',')) {
+                        int idImagen = stoi(tokenImg);
+                        arbolUsuarios.asociarImagen(nombre, idImagen);
+                    }
+                } else {
+                     cout << "Nota: El usuario \"" << nombre << "\" no tiene imagenes asociadas." << endl;
+                }
+            } catch (...) {
+                cout << "Error al procesar el formato de la linea: " << linea << endl;
+            }
+        }
+    }
+    
+    archivo.close();
+    cout << "--- CARGA DE USUARIOS FINALIZADA EXITOSAMENTE ---\n" << endl;
+}

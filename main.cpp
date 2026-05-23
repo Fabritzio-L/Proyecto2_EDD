@@ -10,7 +10,9 @@ int main() {
     
     cargarArchivoImagenes("C:\\Users\\fabri\\Desktop\\Proyecto2_EDD\\prueba.im", listaImagenes, arbolCapas);
 
-    
+    BSTUsuarios arbolUsuarios;
+    cargarArchivoUsuarios("C:\\Users\\fabri\\Desktop\\Proyecto2_EDD\\prueba.usr", arbolUsuarios);
+
     listaImagenes.mostrarImagenes();
 
     
