@@ -8,6 +8,8 @@ int main() {
 
     cargarArchivoCapas("C:\\Users\\fabri\\Desktop\\Proyecto2_EDD\\prueba.cap", arbolCapas);
     
+    cargarArchivoImagenes("C:\\Users\\fabri\\Desktop\\Proyecto2_EDD\\prueba.im", listaImagenes, arbolCapas);
+
     
     listaImagenes.mostrarImagenes();
 

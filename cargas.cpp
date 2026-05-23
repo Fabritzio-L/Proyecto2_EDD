@@ -36,6 +36,7 @@ void cargarArchivoCapas(string ruta, BSTCapas& arbolCapas) {
 
                 getline(ss, token, ',');
                 columna = stoi(token);
+
                 getline(ss, token, ';');
                 color = token;
 
@@ -64,7 +65,59 @@ void cargarArchivoCapas(string ruta, BSTCapas& arbolCapas) {
         }
     }
 
-    archivo.close(); 
+    archivo.close();
     cout << "--- CARGA DE CAPAS FINALIZADA EXITOSAMENTE ---" << endl;
 }
 
+
+void cargarArchivoImagenes(string ruta, ListaCircularImagenes& listaImg, BSTCapas& arbolCapas) {
+    ifstream archivo(ruta);
+    if (!archivo.is_open()) {
+        cout << "Error: No se pudo abrir el archivo de imagenes: " << ruta << endl;
+        return;
+    }
+
+    string linea;
+    cout << "\n--- INICIANDO CARGA MASIVA DE IMAGENES ---" << endl;
+
+    while (getline(archivo, linea)) {
+        if (linea.empty()) continue;
+
+        size_t posLlaveAbre = linea.find('{');
+        size_t posLlaveCierra = linea.find('}');
+
+        if (posLlaveAbre != string::npos && posLlaveCierra != string::npos) {
+            try {
+                string strId = linea.substr(0, posLlaveAbre);
+                int idImagen = stoi(strId);
+
+                listaImg.insertarImagen(idImagen);
+
+                string strCapas = linea.substr(posLlaveAbre + 1, posLlaveCierra - posLlaveAbre - 1);
+                
+                if (!strCapas.empty()) {
+                    stringstream ss(strCapas);
+                    string tokenCapa;
+                    
+                    while (getline(ss, tokenCapa, ',')) {
+                        int idCapa = stoi(tokenCapa);
+                        
+                        NodoCapa* capaRef = arbolCapas.search(idCapa);
+                        if (capaRef != nullptr) {
+                            listaImg.agregarCapaAImagen(idImagen, capaRef);
+                        } else {
+                            cout << "Advertencia: Capa " << idCapa << " no encontrada en el BST." << endl;
+                        }
+                    }
+                } else {
+                     cout << "Nota: La imagen " << idImagen << " no tiene capas asociadas." << endl;
+                }
+            } catch (...) {
+                cout << "Error al procesar el formato de la linea: " << linea << endl;
+            }
+        }
+    }
+    
+    archivo.close();
+    cout << "--- CARGA DE IMAGENES FINALIZADA EXITOSAMENTE ---\n" << endl;
+}
