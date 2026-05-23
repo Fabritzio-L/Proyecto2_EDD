@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <fstream> 
 #include <string>
 #include <iomanip>
 
@@ -233,5 +234,49 @@ public:
     void postorden() {
         postorden(root);
         cout << endl;
+    }
+
+private:
+
+    void generarDotCapas(NodoCapa* node, ofstream& archivo) {
+        if (node == nullptr) return;
+
+        archivo << "    \"Capa_" << node->idCapa << "\" [label=\"Capa " << node->idCapa << "\", shape=box, style=filled, fillcolor=lightgreen];\n";
+
+        if (node->left != nullptr) {
+            archivo << "    \"Capa_" << node->idCapa << "\" -> \"Capa_" << node->left->idCapa << "\";\n";
+            generarDotCapas(node->left, archivo);
+        }
+        
+        if (node->right != nullptr) {
+            archivo << "    \"Capa_" << node->idCapa << "\" -> \"Capa_" << node->right->idCapa << "\";\n";
+            generarDotCapas(node->right, archivo);
+        }
+    }
+
+public:
+    void graficarArbolCapas() {
+        if (root == nullptr) {
+            cout << "El arbol de capas esta vacio." << endl;
+            return;
+        }
+
+        ofstream archivo("arbol_capas.dot");
+        if (!archivo.is_open()) {
+            cout << "Error: No se pudo crear el archivo dot para capas." << endl;
+            return;
+        }
+
+        archivo << "digraph ArbolCapas {\n";
+        archivo << "    rankdir=TB;\n"; 
+
+        generarDotCapas(root, archivo);
+
+        archivo << "}\n";
+        archivo.close();
+
+        system("dot -Tpng arbol_capas.dot -o arbol_capas.png");
+        
+        cout << "¡Exito! Se genero la imagen arbol_capas.png en la carpeta del proyecto." << endl;
     }
 }; 
