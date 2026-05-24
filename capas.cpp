@@ -369,4 +369,9 @@ public:
         
         cout << "¡Exito! Se genero la imagen arbol_capas.png en la carpeta del proyecto." << endl;
     }
+    void escribirDotDelArbol(ofstream& archivo) {
+        if (root != nullptr) {
+            generarDotCapas(root, archivo);
+        }
+    }
 }; 

@@ -212,4 +212,49 @@ public:
         
         cout << "¡Exito! Se genero la imagen lista_imagenes.png en la carpeta del proyecto." << endl;
     }
+    void graficarImagenYArbol(int idImagen, BSTCapas& arbolCapas) {
+        NodoImagen* img = buscarImagen(idImagen);
+        if (img == nullptr) {
+            cout << "Error: La imagen " << idImagen << " no existe." << endl;
+            return;
+        }
+
+        ofstream archivo("imagen_arbol_" + to_string(idImagen) + ".dot");
+        if (!archivo.is_open()) {
+            cout << "Error al crear el archivo dot." << endl;
+            return;
+        }
+
+        archivo << "digraph ImagenArbol {\n";
+        archivo << "    rankdir=TB;\n";
+
+        archivo << "    \"Imagen_" << img->idImagen << "\" [label=\"Imagen " << img->idImagen << "\", shape=box, color=red, fontcolor=red];\n";
+
+        NodoCapaImagen* aux = img->cabezaCapas;
+        if (aux != nullptr) {
+            archivo << "    \"Imagen_" << img->idImagen << "\" -> \"CapaList_" << aux->capaPuntero->idCapa << "\" [color=red];\n";
+            
+            while (aux != nullptr) {
+                archivo << "    \"CapaList_" << aux->capaPuntero->idCapa << "\" [label=\"capa_" << aux->capaPuntero->idCapa << "\", shape=box, style=rounded, color=red, fontcolor=red];\n";
+                
+                if (aux->siguiente != nullptr) {
+                    archivo << "    \"CapaList_" << aux->capaPuntero->idCapa << "\" -> \"CapaList_" << aux->siguiente->capaPuntero->idCapa << "\" [color=red];\n";
+                }
+
+                archivo << "    \"CapaList_" << aux->capaPuntero->idCapa << "\" -> \"Capa_" << aux->capaPuntero->idCapa << "\" [color=red, constraint=false];\n";
+                
+                aux = aux->siguiente;
+            }
+        }
+
+        arbolCapas.escribirDotDelArbol(archivo);
+
+        archivo << "}\n";
+        archivo.close();
+
+        string comando = "dot -Tpng imagen_arbol_" + to_string(idImagen) + ".dot -o imagen_arbol_" + to_string(idImagen) + ".png";
+        system(comando.c_str());
+
+        cout << "¡Exito! Se genero el grafico combinado para la Imagen " << idImagen << "." << endl;
+    }
 };

@@ -16,9 +16,9 @@ int main() {
     listaImagenes.mostrarImagenes();
 
     cout << "\n--- GENERANDO REPORTES VISUALES ---" << endl;
-    arbolUsuarios.graficarArbolUsuarios();
-    arbolCapas.graficarArbolCapas();
-    listaImagenes.graficarListaImagenes();
+    //arbolUsuarios.graficarArbolUsuarios();
+   // arbolCapas.graficarArbolCapas();
+  //  listaImagenes.graficarListaImagenes();
     
     cout << "\n--- GENERANDO REPORTE DE CAPA (MATRIZ DISPERSA) ---" << endl;
     
@@ -29,6 +29,7 @@ int main() {
     } else {
         cout << "La capa 101 no existe en el sistema." << endl;
     }
-    
+    cout << "\n--- GENERANDO REPORTE COMBINADO ---" << endl;
+    listaImagenes.graficarImagenYArbol(100, arbolCapas);
     return 0;
 }
