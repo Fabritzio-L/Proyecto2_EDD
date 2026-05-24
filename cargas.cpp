@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "capas.cpp" 
+#include "usuarios.cpp" 
 
 using namespace std;
 
@@ -56,11 +56,17 @@ void cargarArchivoCapas(string ruta, BSTCapas& arbolCapas) {
 
         } 
         else {
-            try {
-                idCapaActual = stoi(linea);
+            string posibleID = "";
+            
+            for (char c : linea) {
+                if (isdigit(c)) {
+                    posibleID += c;
+                }
+            }
+            
+            if (!posibleID.empty()) {
+                idCapaActual = stoi(posibleID);
                 arbolCapas.insert(idCapaActual);
-            } catch (...) {
-                cout << "Linea ignorada (No es ID valido): " << linea << endl;
             }
         }
     }

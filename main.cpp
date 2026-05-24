@@ -1,35 +1,107 @@
+#pragma once
 #include <iostream>
+#include <string>
 #include "usuarios.cpp"
 #include "cargas.cpp"
+
+using namespace std;
+
+void menuReportes(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BSTUsuarios& arbolUsuarios) {
+    int opc = 0;
+    do {
+        cout << "\n--- ESTADO DE LA MEMORIA (REPORTES) ---" << endl;
+        cout << "1. Ver arbol de usuarios" << endl;
+        cout << "2. Ver arbol de capas" << endl;
+        cout << "3. Ver lista de imagenes" << endl;
+        cout << "4. Ver capa especifica (Matriz Dispersa)" << endl;
+        cout << "5. Ver imagen y arbol de capas" << endl;
+        cout << "6. Regresar al menu principal" << endl;
+        cout << "Elige una opcion: ";
+        cin >> opc;
+
+        switch(opc) {
+            case 1:
+                arbolUsuarios.graficarArbolUsuarios();
+                break;
+            case 2:
+                arbolCapas.graficarArbolCapas();
+                break;
+            case 3:
+                listaImagenes.graficarListaImagenes();
+                break;
+            case 4: {
+                int idCapa;
+                cout << "Ingrese el ID de la capa a graficar: ";
+                cin >> idCapa;
+                NodoCapa* capa = arbolCapas.search(idCapa);
+                if (capa != nullptr) {
+                    capa->pixeles->graficarCapa(idCapa);
+                } else {
+                    cout << "Error: La capa " << idCapa << " no existe en el arbol." << endl;
+                }
+                break;
+            }
+            case 5: {
+                int idImg;
+                cout << "Ingrese el ID de la imagen: ";
+                cin >> idImg;
+                listaImagenes.graficarImagenYArbol(idImg, arbolCapas);
+                break;
+            }
+            case 6:
+                break;
+            default:
+                cout << "Opcion invalida." << endl;
+        }
+    } while (opc != 6);
+}
 
 int main() {
     BSTCapas arbolCapas; 
     ListaCircularImagenes listaImagenes;
+    BSTUsuarios arbolUsuarios; 
 
-    cargarArchivoCapas("C:\\Users\\fabri\\Desktop\\Proyecto2_EDD\\prueba.cap", arbolCapas);
-    
-    cargarArchivoImagenes("C:\\Users\\fabri\\Desktop\\Proyecto2_EDD\\prueba.im", listaImagenes, arbolCapas);
+    int opcion = 0;
+    do {
+        cout << "\n SISTEMA GENERADOR DE IMAGENES " << endl;
+        cout << "1. Carga Masiva de Archivos" << endl;
+        cout << "2. Generacion de Imagenes" << endl;
+        cout << "3. Reportes (Estado de la Memoria)" << endl;
+        cout << "4. Salir" << endl;
+        cout << "Elige una opcion: ";
+        cin >> opcion;
 
-    BSTUsuarios arbolUsuarios;
-    cargarArchivoUsuarios("C:\\Users\\fabri\\Desktop\\Proyecto2_EDD\\prueba.usr", arbolUsuarios);
+        switch(opcion) {
+            case 1: {
+                cout << "\n--- INICIANDO CARGA MASIVA AUTOMATICA ---" << endl;
+                
+                cargarArchivoCapas("../capas.cap", arbolCapas);
+                cargarArchivoImagenes("../imagenes.im", listaImagenes, arbolCapas);
+                cargarArchivoUsuarios("../prueba.usr", arbolUsuarios);
+                
+                cout << "--- CARGA AUTOMATICA COMPLETADA ---" << endl;
+                break;
+            }
+            case 2: {
+                cout << "\n--- GENERACION DE IMAGENES ---" << endl;
+                cout << "1. Por recorrido limitado" << endl;
+                cout << "2. Por lista de imagenes" << endl;
+                cout << "Seleccione: ";
+                int opcGen;
+                cin >> opcGen;
+                cout << "(Lógica de superposicion en construccion...)" << endl;
+                break;
+            }
+            case 3:
+                menuReportes(arbolCapas, listaImagenes, arbolUsuarios);
+                break;
+            case 4:
+                cout << "Saliendo del programa. ¡Hasta pronto!" << endl;
+                break;
+            default:
+                cout << "Opcion invalida." << endl;
+        }
+    } while (opcion != 4);
 
-    listaImagenes.mostrarImagenes();
-
-    cout << "\n--- GENERANDO REPORTES VISUALES ---" << endl;
-    //arbolUsuarios.graficarArbolUsuarios();
-   // arbolCapas.graficarArbolCapas();
-  //  listaImagenes.graficarListaImagenes();
-    
-    cout << "\n--- GENERANDO REPORTE DE CAPA (MATRIZ DISPERSA) ---" << endl;
-    
-    NodoCapa* capaAGraficar = arbolCapas.search(101);
-    
-    if (capaAGraficar != nullptr) {
-        capaAGraficar->pixeles->graficarCapa(101);
-    } else {
-        cout << "La capa 101 no existe en el sistema." << endl;
-    }
-    cout << "\n--- GENERANDO REPORTE COMBINADO ---" << endl;
-    listaImagenes.graficarImagenYArbol(100, arbolCapas);
     return 0;
 }
