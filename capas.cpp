@@ -217,6 +217,74 @@ public:
 
         cout << "¡Exito! Se genero el grafico de la matriz para la Capa " << idCapa << " en la carpeta." << endl;
     }
+    void superponer(MatrizDispersa* capaSuperior) {
+        if (capaSuperior == nullptr) return;
+
+        Cabecera* auxFila = capaSuperior->filaCabeceraRaiz;
+        while (auxFila != nullptr) {
+            NodoMatriz* auxNodo = auxFila->primerNodo;
+            while (auxNodo != nullptr) {
+                insertar(auxNodo->fila, auxNodo->columna, auxNodo->color);
+                auxNodo = auxNodo->derecha;
+            }
+            auxFila = auxFila->siguiente;
+        }
+    }
+
+    void exportarImagenHTML(string nombreArchivo) {
+        int maxFila = 0, maxCol = 0;
+        
+        Cabecera* auxF = filaCabeceraRaiz;
+        while (auxF != nullptr) {
+            if (auxF->indice > maxFila) maxFila = auxF->indice;
+            auxF = auxF->siguiente;
+        }
+        
+        Cabecera* auxC = columnaCabeceraRaiz;
+        while (auxC != nullptr) {
+            if (auxC->indice > maxCol) maxCol = auxC->indice;
+            auxC = auxC->siguiente;
+        }
+
+        ofstream archivo(nombreArchivo + ".dot");
+        if (!archivo.is_open()) return;
+
+        archivo << "digraph G {\n";
+        archivo << "    node [shape=plaintext];\n";
+        archivo << "    matriz [label=<\n";
+        archivo << "        <TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\">\n";
+
+        Cabecera* fActual = filaCabeceraRaiz;
+
+        for (int i = 1; i <= maxFila; i++) {
+            archivo << "            <TR>\n";
+            NodoMatriz* nodoActual = nullptr;
+            
+            if (fActual != nullptr && fActual->indice == i) {
+                nodoActual = fActual->primerNodo;
+                fActual = fActual->siguiente;
+            }
+
+            for (int j = 1; j <= maxCol; j++) {
+                if (nodoActual != nullptr && nodoActual->columna == j) {
+                    archivo << "                <TD BGCOLOR=\"" << nodoActual->color << "\" WIDTH=\"20\" HEIGHT=\"20\"></TD>\n";
+                    nodoActual = nodoActual->derecha;
+                } else {
+                    archivo << "                <TD BGCOLOR=\"#000000\" WIDTH=\"20\" HEIGHT=\"20\"></TD>\n"; 
+                }
+            }
+            archivo << "            </TR>\n";
+        }
+
+        archivo << "        </TABLE>\n";
+        archivo << "    >];\n";
+        archivo << "}\n";
+        archivo.close();
+
+        string comando = "dot -Tpng " + nombreArchivo + ".dot -o " + nombreArchivo + ".png";
+        system(comando.c_str());
+        cout << "Imagen generada: " << nombreArchivo << ".png" << endl;
+    }
 };
 
 class NodoCapa {
@@ -373,5 +441,45 @@ public:
         if (root != nullptr) {
             generarDotCapas(root, archivo);
         }
+    }
+private:
+    void preordenLimitado(NodoCapa* nodo, int& contador, int limite, MatrizDispersa* lienzo) {
+        if (nodo == nullptr || contador >= limite) return;
+        lienzo->superponer(nodo->pixeles);
+        contador++;
+        preordenLimitado(nodo->left, contador, limite, lienzo);
+        preordenLimitado(nodo->right, contador, limite, lienzo);
+    }
+
+    void inordenLimitado(NodoCapa* nodo, int& contador, int limite, MatrizDispersa* lienzo) {
+        if (nodo == nullptr || contador >= limite) return;
+        inordenLimitado(nodo->left, contador, limite, lienzo);
+        if (contador < limite) {
+            lienzo->superponer(nodo->pixeles);
+            contador++;
+        }
+        inordenLimitado(nodo->right, contador, limite, lienzo);
+    }
+
+    void postordenLimitado(NodoCapa* nodo, int& contador, int limite, MatrizDispersa* lienzo) {
+        if (nodo == nullptr || contador >= limite) return;
+        postordenLimitado(nodo->left, contador, limite, lienzo);
+        postordenLimitado(nodo->right, contador, limite, lienzo);
+        if (contador < limite) {
+            lienzo->superponer(nodo->pixeles);
+            contador++;
+        }
+    }
+
+public:
+    void generarPorRecorrido(int tipo, int limite) {
+        MatrizDispersa lienzo;
+        int contador = 0;
+        
+        if (tipo == 1) preordenLimitado(root, contador, limite, &lienzo);
+        else if (tipo == 2) inordenLimitado(root, contador, limite, &lienzo);
+        else if (tipo == 3) postordenLimitado(root, contador, limite, &lienzo);
+        
+        lienzo.exportarImagenHTML("imagen_recorrido");
     }
 }; 

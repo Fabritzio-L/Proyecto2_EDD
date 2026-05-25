@@ -89,7 +89,78 @@ int main() {
                 cout << "Seleccione: ";
                 int opcGen;
                 cin >> opcGen;
-                cout << "(Lógica de superposicion en construccion...)" << endl;
+                
+                if (opcGen == 1) {
+                    int tipoRecorrido, limite;
+                    cout << "\n--- POR RECORRIDO LIMITADO ---" << endl;
+                    cout << "Tipo (1. Preorden, 2. Inorden, 3. Postorden): ";
+                    cin >> tipoRecorrido;
+                    cout << "Cantidad de capas a procesar: ";
+                    cin >> limite;
+                    arbolCapas.generarPorRecorrido(tipoRecorrido, limite);
+                } 
+                else if (opcGen == 2) {
+                    cout << "\n--- POR LISTA DE IMAGENES ---" << endl;
+                    cout << "1. Buscar por ID de imagen general" << endl;
+                    cout << "2. Buscar por Usuario" << endl;
+                    cout << "Seleccione: ";
+                    int opcLista;
+                    cin >> opcLista;
+
+                    if (opcLista == 1) {
+                        int idImg;
+                        cout << "Ingrese el ID de la imagen a generar: ";
+                        cin >> idImg;
+                        listaImagenes.generarImagenFinal(idImg);
+                    }
+                    else if (opcLista == 2) {
+                        string nombreBuscar;
+                        cout << "Ingrese el nombre de usuario: ";
+                        cin >> nombreBuscar;
+
+                        NodoUsuario* usuarioNodo = arbolUsuarios.search(nombreBuscar);
+
+                        if (usuarioNodo == nullptr) {
+                            cout << "Error: El usuario \"" << nombreBuscar << "\" no existe en el sistema." << endl;
+                        } 
+                        else {
+                            cout << "\nImagenes asignadas a " << nombreBuscar << ":" << endl;
+                            NodoImagenUsuario* auxImg = usuarioNodo->cabezaImagenes;
+                            
+                            if (auxImg == nullptr) {
+                                cout << "Este usuario no tiene ninguna imagen asociada." << endl;
+                            } 
+                            else {
+                                while (auxImg != nullptr) {
+                                    cout << "- Imagen ID: " << auxImg->idImagen << endl;
+                                    auxImg = auxImg->siguiente;
+                                }
+
+                                int idElegido;
+                                cout << "Ingrese el ID de la imagen que desea generar: ";
+                                cin >> idElegido;
+
+                                bool tienePermiso = false;
+                                auxImg = usuarioNodo->cabezaImagenes;
+                                while (auxImg != nullptr) {
+                                    if (auxImg->idImagen == idElegido) {
+                                        tienePermiso = true;
+                                        break;
+                                    }
+                                    auxImg = auxImg->siguiente;
+                                }
+
+                                if (tienePermiso) {
+                                    listaImagenes.generarImagenFinal(idElegido);
+                                } else {
+                                    cout << "Error: La imagen " << idElegido << " no pertenece a este usuario." << endl;
+                                }
+                            }
+                        }
+                    } else {
+                        cout << "Opcion invalida." << endl;
+                    }
+                }
                 break;
             }
             case 3:

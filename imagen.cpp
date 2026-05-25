@@ -257,4 +257,21 @@ public:
 
         cout << "¡Exito! Se genero el grafico combinado para la Imagen " << idImagen << "." << endl;
     }
+void generarImagenFinal(int idImagen) {
+        NodoImagen* img = buscarImagen(idImagen);
+        if (img == nullptr) {
+            cout << "Error: La imagen no existe en el sistema." << endl;
+            return;
+        }
+        
+        MatrizDispersa lienzo;
+        
+        NodoCapaImagen* aux = img->cabezaCapas;
+        while (aux != nullptr) {
+            lienzo.superponer(aux->capaPuntero->pixeles);
+            aux = aux->siguiente;
+        }
+        
+        lienzo.exportarImagenHTML("imagen_final_" + to_string(idImagen));
+    }
 };
