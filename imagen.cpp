@@ -152,6 +152,10 @@ public:
         } while (aux != cabeza);
         cout << "----------------------------------\n" << endl;
     }
+
+    // ----------------------------------------------------------------
+    // REPORTE GRAPHVIZ: LISTA CIRCULAR DE IMÁGENES Y SUS CAPAS (VERTICAL)
+    // ----------------------------------------------------------------
     void graficarListaImagenes() {
         if (cabeza == nullptr) {
             cout << "La lista de imagenes esta vacia." << endl;
@@ -165,34 +169,41 @@ public:
         }
 
         archivo << "digraph ListaImagenes {\n";
-        archivo << "    rankdir=LR;\n"; // Left to Right (De izquierda a derecha)
-        archivo << "    node [shape=record, style=filled, fillcolor=lightyellow];\n\n";
+        archivo << "    rankdir=TB;\n"; // CAMBIO CLAVE: El flujo principal ahora va hacia ABAJO
+        archivo << "    node [shape=box, style=filled, fillcolor=lightyellow];\n\n";
 
+        // 1. Forzamos a que todas las imágenes principales compartan la misma fila horizontal
         archivo << "    { rank=same;\n";
         NodoImagen* aux = cabeza;
         do {
-            archivo << "        \"Img_" << aux->idImagen << "\" [label=\"{ <ant> | Imagen " << aux->idImagen << " | <sig> }\"];\n";
+            archivo << "        \"Img_" << aux->idImagen << "\" [label=\"Imagen " << aux->idImagen << "\"];\n";
             aux = aux->siguiente;
         } while (aux != cabeza);
         archivo << "    }\n\n";
 
+        // 2. Conexiones circulares dobles entre las imágenes (en el eje horizontal)
         aux = cabeza;
         do {
-            archivo << "    \"Img_" << aux->idImagen << "\":sig -> \"Img_" << aux->siguiente->idImagen << "\":ant;\n";
-            
-            archivo << "    \"Img_" << aux->idImagen << "\":ant -> \"Img_" << aux->anterior->idImagen << "\":sig;\n";
-            
+            if (aux->siguiente == cabeza) {
+                // constraint=false evita que la flecha de regreso al inicio distorsione la fila horizontal
+                archivo << "    \"Img_" << aux->idImagen << "\" -> \"Img_" << aux->siguiente->idImagen << "\" [dir=both, constraint=false];\n";
+            } else {
+                archivo << "    \"Img_" << aux->idImagen << "\" -> \"Img_" << aux->siguiente->idImagen << "\" [dir=both];\n";
+            }
             aux = aux->siguiente;
         } while (aux != cabeza);
 
+        // 3. Dibujamos las sublistas de capas colgando verticalmente de cada imagen
         aux = cabeza;
         do {
             NodoCapaImagen* auxCapa = aux->cabezaCapas;
             if (auxCapa != nullptr) {
+                // La primera capa se conecta directamente debajo de la imagen correspondiente
                 archivo << "    \"CapaImg_" << aux->idImagen << "_" << auxCapa->capaPuntero->idCapa 
                         << "\" [label=\"Capa " << auxCapa->capaPuntero->idCapa << "\", shape=box, fillcolor=lightgrey];\n";
                 archivo << "    \"Img_" << aux->idImagen << "\" -> \"CapaImg_" << aux->idImagen << "_" << auxCapa->capaPuntero->idCapa << "\";\n";
 
+                // Las siguientes capas se van conectando una debajo de la otra de forma consecutiva
                 while (auxCapa->siguiente != nullptr) {
                     archivo << "    \"CapaImg_" << aux->idImagen << "_" << auxCapa->siguiente->capaPuntero->idCapa 
                             << "\" [label=\"Capa " << auxCapa->siguiente->capaPuntero->idCapa << "\", shape=box, fillcolor=lightgrey];\n";
@@ -208,6 +219,7 @@ public:
         archivo << "}\n";
         archivo.close();
 
+        // Compilar el archivo .dot a formato PNG de forma automática
         system("dot -Tpng lista_imagenes.dot -o lista_imagenes.png");
         
         cout << "¡Exito! Se genero la imagen lista_imagenes.png en la carpeta del proyecto." << endl;
@@ -257,7 +269,7 @@ public:
 
         cout << "¡Exito! Se genero el grafico combinado para la Imagen " << idImagen << "." << endl;
     }
-void generarImagenFinal(int idImagen) {
+    void generarImagenFinal(int idImagen) {
         NodoImagen* img = buscarImagen(idImagen);
         if (img == nullptr) {
             cout << "Error: La imagen no existe en el sistema." << endl;
@@ -273,5 +285,59 @@ void generarImagenFinal(int idImagen) {
         }
         
         lienzo.exportarImagenHTML("imagen_final_" + to_string(idImagen));
+    }
+// Verificar si el ID de la imagen ya existe en la lista circular (Garantiza ID único)
+    bool existeImagen(int id) {
+        if (cabeza == nullptr) return false;
+        NodoImagen* aux = cabeza;
+        do {
+            if (aux->idImagen == id) return true;
+            aux = aux->siguiente;
+        } while (aux != cabeza);
+        return false;
+    }
+
+    // Eliminar la imagen de la Lista Circular Doble Global
+    bool eliminarImagenGlobal(int id) {
+        if (cabeza == nullptr) return false;
+
+        NodoImagen* actual = cabeza;
+        bool encontrado = false;
+
+        // Buscar el nodo
+        do {
+            if (actual->idImagen == id) {
+                encontrado = true;
+                break;
+            }
+            actual = actual->siguiente;
+        } while (actual != cabeza);
+
+        if (!encontrado) return false;
+
+        // Caso A: Es el único nodo en la lista circular
+        if (actual->siguiente == cabeza && actual->anterior == cabeza) {
+            cabeza = nullptr;
+        } else {
+            // Caso B: Ajustar los nodos adyacentes
+            actual->anterior->siguiente = actual->siguiente;
+            actual->siguiente->anterior = actual->anterior;
+            
+            // Si eliminamos la cabeza física, movemos el apuntador al siguiente
+            if (actual == cabeza) {
+                cabeza = actual->siguiente;
+            }
+        }
+
+        // Liberar la sublista interna de capas que tenía esta imagen
+        NodoCapaImagen* auxCapa = actual->cabezaCapas;
+        while (auxCapa != nullptr) {
+            NodoCapaImagen* temp = auxCapa;
+            auxCapa = auxCapa->siguiente;
+            delete temp;
+        }
+
+        delete actual; // Liberar memoria
+        return true;
     }
 };

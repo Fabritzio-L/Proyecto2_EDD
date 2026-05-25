@@ -10,26 +10,25 @@ void menuReportes(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BS
     int opc = 0;
     do {
         cout << "\n--- ESTADO DE LA MEMORIA (REPORTES) ---" << endl;
-        cout << "1. Ver arbol de usuarios" << endl;
+        cout << "1. Ver lista de imagenes" << endl;
         cout << "2. Ver arbol de capas" << endl;
-        cout << "3. Ver lista de imagenes" << endl;
-        cout << "4. Ver capa especifica (Matriz Dispersa)" << endl;
-        cout << "5. Ver imagen y arbol de capas" << endl;
+        cout << "3. Ver capa especifica" << endl;
+        cout << "4. Ver imagen y arbol de capas" << endl;
+        cout << "5. Ver arbol de usuarios" << endl;
         cout << "6. Regresar al menu principal" << endl;
         cout << "Elige una opcion: ";
         cin >> opc;
 
         switch(opc) {
-            case 1:
-                arbolUsuarios.graficarArbolUsuarios();
-                break;
-            case 2:
-                arbolCapas.graficarArbolCapas();
-                break;
-            case 3:
+            case 1: {
                 listaImagenes.graficarListaImagenes();
                 break;
-            case 4: {
+            }
+            case 2: {
+                arbolCapas.graficarArbolCapas();
+                break;
+            }
+            case 3: {
                 int idCapa;
                 cout << "Ingrese el ID de la capa a graficar: ";
                 cin >> idCapa;
@@ -41,11 +40,120 @@ void menuReportes(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BS
                 }
                 break;
             }
-            case 5: {
+            case 4: {
                 int idImg;
                 cout << "Ingrese el ID de la imagen: ";
                 cin >> idImg;
                 listaImagenes.graficarImagenYArbol(idImg, arbolCapas);
+                break;
+            }
+            case 5: {                
+                arbolUsuarios.graficarArbolUsuarios();
+                break;
+            }
+            case 6: {
+                break;
+            }
+            default:
+                cout << "Opcion invalida." << endl;
+        }
+    } while (opc != 6);
+}
+
+
+void menuCRUD(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BSTUsuarios& arbolUsuarios) {
+    int opc = 0;
+    do {
+        cout << "\n--- OPERACIONES CRUD (MANTENIMIENTO) ---" << endl;
+        cout << "1. Agregar Usuario" << endl;
+        cout << "2. Modificar Usuario" << endl;
+        cout << "3. Eliminar Usuario" << endl;
+        cout << "4. Agregar Imagen" << endl;
+        cout << "5. Eliminar Imagen" << endl;
+        cout << "6. Regresar al menu principal" << endl;
+        cout << "Elige una opcion: ";
+        cin >> opc;
+
+        switch(opc) {
+            case 1: {
+                string nuevoUsr;
+                cout << "Ingrese el nombre del nuevo usuario: ";
+                cin >> nuevoUsr;
+                if (arbolUsuarios.search(nuevoUsr) == nullptr) {
+                    arbolUsuarios.insert(nuevoUsr);
+                    cout << "Usuario creado exitosamente." << endl;
+                } else {
+                    cout << "Error: El usuario ya existe." << endl;
+                }
+                break;
+            }
+            case 2: {
+                string vNombre, nNombre;
+                cout << "Nombre del usuario a modificar: ";
+                cin >> vNombre;
+                cout << "Ingrese el nuevo nombre: ";
+                cin >> nNombre;
+                arbolUsuarios.modificarUsuario(vNombre, nNombre);
+                break;
+            }
+            case 3: {
+                string usrEliminar;
+                cout << "Nombre del usuario a eliminar: ";
+                cin >> usrEliminar;
+                arbolUsuarios.eliminarUsuario(usrEliminar);
+                break;
+            }
+            case 4: {
+                string nombreUsr;
+                int idNuevaImg;
+                cout << "Ingrese el nombre del usuario al que se asignara la imagen: ";
+                cin >> nombreUsr;
+                
+                NodoUsuario* user = arbolUsuarios.search(nombreUsr);
+                if (user == nullptr) {
+                    cout << "Error: El usuario no existe." << endl;
+                    break;
+                }
+
+                cout << "Ingrese el ID único de la nueva imagen: ";
+                cin >> idNuevaImg;
+
+                if (listaImagenes.existeImagen(idNuevaImg)) {
+                    cout << "Error: El ID de imagen ya existe en el sistema global." << endl;
+                } else {
+                    listaImagenes.insertarImagen(idNuevaImg);
+                    arbolUsuarios.asociarImagen(nombreUsr, idNuevaImg);
+                    cout << "Imagen " << idNuevaImg << " agregada y enlazada correctamente al usuario." << endl;
+                    
+                    cout << "¿Desea asociarle una capa existente ahora mismo? (S/N): ";
+                    char resp; cin >> resp;
+                    if (resp == 'S' || resp == 's') {
+                        int idCapa;
+                        cout << "ID de la capa: "; cin >> idCapa;
+                        NodoCapa* cp = arbolCapas.search(idCapa);
+                        if (cp != nullptr) {
+                            listaImagenes.agregarCapaAImagen(idNuevaImg, cp);
+                        } else {
+                            cout << "La capa no existe, se creo la imagen vacia." << endl;
+                        }
+                    }
+                }
+                break;
+            }
+            case 5: {
+                string nombreUsr;
+                int idImgEliminar;
+                cout << "Ingrese el nombre del usuario: ";
+                cin >> nombreUsr;
+                cout << "Ingrese el ID de la imagen a eliminar: ";
+                cin >> idImgEliminar;
+
+                arbolUsuarios.eliminarImagenDeUsuario(nombreUsr, idImgEliminar);
+                if (listaImagenes.eliminarImagenGlobal(idImgEliminar)) {
+                    cout << "Imagen " << idImgEliminar << " eliminada completamente de la memoria global." << endl;
+                } else {
+                    cout << "Nota: La imagen no figuraba en la lista circular global." << endl;
+                }
                 break;
             }
             case 6:
@@ -67,7 +175,8 @@ int main() {
         cout << "1. Carga Masiva de Archivos" << endl;
         cout << "2. Generacion de Imagenes" << endl;
         cout << "3. Reportes (Estado de la Memoria)" << endl;
-        cout << "4. Salir" << endl;
+        cout << "4. CRUD " << endl;
+        cout << "5. Salir" << endl;
         cout << "Elige una opcion: ";
         cin >> opcion;
 
@@ -167,12 +276,15 @@ int main() {
                 menuReportes(arbolCapas, listaImagenes, arbolUsuarios);
                 break;
             case 4:
+                menuCRUD(arbolCapas, listaImagenes, arbolUsuarios);
+                break;
+            case 5:
                 cout << "Saliendo del programa. ¡Hasta pronto!" << endl;
                 break;
             default:
                 cout << "Opcion invalida." << endl;
         }
-    } while (opcion != 4);
+    } while (opcion != 5);
 
     return 0;
 }

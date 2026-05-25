@@ -473,13 +473,27 @@ private:
 
 public:
     void generarPorRecorrido(int tipo, int limite) {
-        MatrizDispersa lienzo;
+        MatrizDispersa lienzo; 
         int contador = 0;
+        string nombre_salida = "recorrido_"; 
         
-        if (tipo == 1) preordenLimitado(root, contador, limite, &lienzo);
-        else if (tipo == 2) inordenLimitado(root, contador, limite, &lienzo);
-        else if (tipo == 3) postordenLimitado(root, contador, limite, &lienzo);
+        if (tipo == 1) {
+            preordenLimitado(root, contador, limite, &lienzo);
+            nombre_salida += "preorden_" + to_string(limite);
+        }
+        else if (tipo == 2) {
+            inordenLimitado(root, contador, limite, &lienzo);
+            nombre_salida += "inorden_" + to_string(limite);
+        }
+        else if (tipo == 3) {
+            postordenLimitado(root, contador, limite, &lienzo);
+            nombre_salida += "postorden_" + to_string(limite);
+        }
+        else {
+            cout << "Tipo de recorrido invalido." << endl;
+            return;
+        }
         
-        lienzo.exportarImagenHTML("imagen_recorrido");
+        lienzo.exportarImagenHTML(nombre_salida);
     }
 }; 

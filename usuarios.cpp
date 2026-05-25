@@ -184,4 +184,101 @@ public:
         
         // system("arbol_usuarios.png"); 
     }
+private:
+    // Función auxiliar recursiva para encontrar el nodo menor (sucesor en inorden)
+    NodoUsuario* encontrarMinimo(NodoUsuario* nodo) {
+        while (nodo->left != nullptr) nodo = nodo->left;
+        return nodo;
+    }
+
+    // Función auxiliar recursiva para eliminar un nodo del BST
+    NodoUsuario* eliminarNodoUsuario(NodoUsuario* raiz, string nombre, bool& eliminado) {
+        if (raiz == nullptr) return raiz;
+
+        if (nombre < raiz->nombreUsuario) {
+            raiz->left = eliminarNodoUsuario(raiz->left, nombre, eliminado);
+        } else if (nombre > raiz->nombreUsuario) {
+            raiz->right = eliminarNodoUsuario(raiz->right, nombre, eliminado);
+        } else {
+            eliminado = true;
+            // Caso 1 y 2: Un hijo o ninguno
+            if (raiz->left == nullptr) {
+                NodoUsuario* temp = raiz->right;
+                delete raiz;
+                return temp;
+            } else if (raiz->right == nullptr) {
+                NodoUsuario* temp = raiz->left;
+                delete raiz;
+                return temp;
+            }
+            // Caso 3: Dos hijos, se obtiene el sucesor en inorden
+            NodoUsuario* temp = encontrarMinimo(raiz->right);
+            raiz->nombreUsuario = temp->nombreUsuario;
+            raiz->cabezaImagenes = temp->cabezaImagenes; // Conserva sus imágenes
+            raiz->right = eliminarNodoUsuario(raiz->right, temp->nombreUsuario, eliminado);
+        }
+        return raiz;
+    }
+
+public:
+    // E-liminar Usuario del BST
+    void eliminarUsuario(string nombre) {
+        bool eliminado = false;
+        root = eliminarNodoUsuario(root, nombre, eliminado);
+        if (eliminado) {
+            cout << "Usuario \"" << nombre << "\" eliminado exitosamente del sistema." << endl;
+        } else {
+            cout << "Error: El usuario \"" << nombre << "\" no fue encontrado." << endl;
+        }
+    }
+
+    // M-odificar Nombre de Usuario
+    void modificarUsuario(string nombreViejo, string nombreNuevo) {
+        NodoUsuario* user = search(nombreViejo);
+        if (user == nullptr) {
+            cout << "Error: El usuario \"" << nombreViejo << "\" no existe." << endl;
+            return;
+        }
+        if (search(nombreNuevo) != nullptr) {
+            cout << "Error: El nombre \"" << nombreNuevo << "\" ya esta en uso." << endl;
+            return;
+        }
+
+        // Resguardamos su lista de imágenes asociadas
+        NodoImagenUsuario* listaImgsGuardada = user->cabezaImagenes;
+
+        // Lo eliminamos y lo reinstanciamos para que mantenga el orden alfabético correcto del BST
+        bool de = false;
+        root = eliminarNodoUsuario(root, nombreViejo, de);
+        
+        insert(nombreNuevo);
+        NodoUsuario* nuevoNodo = search(nombreNuevo);
+        nuevoNodo->cabezaImagenes = listaImgsGuardada;
+
+        cout << "Usuario actualizado correctamente de \"" << nombreViejo << "\" a \"" << nombreNuevo << "\"." << endl;
+    }
+
+    // Eliminar una imagen de la lista enlazada simple de un usuario específico
+    void eliminarImagenDeUsuario(string nombreUsuario, int idImagen) {
+        NodoUsuario* user = search(nombreUsuario);
+        if (user == nullptr) return;
+
+        NodoImagenUsuario* actual = user->cabezaImagenes;
+        NodoImagenUsuario* anterior = nullptr;
+
+        while (actual != nullptr) {
+            if (actual->idImagen == idImagen) {
+                if (anterior == nullptr) {
+                    user->cabezaImagenes = actual->siguiente;
+                } else {
+                    anterior->siguiente = actual->siguiente;
+                }
+                delete actual;
+                cout << "Imagen " << idImagen << " removida de la lista del usuario." << endl;
+                return;
+            }
+            anterior = actual;
+            actual = actual->siguiente;
+        }
+    }
 };
