@@ -1,0 +1,18 @@
+digraph ImagenArbol {
+    rankdir=TB;
+    "Imagen_1" [label="Imagen 1", shape=box, color=red, fontcolor=red];
+    "Imagen_1" -> "CapaList_1" [color=red];
+    "CapaList_1" [label="capa_1", shape=box, style=rounded, color=red, fontcolor=red];
+    "CapaList_1" -> "CapaList_2" [color=red];
+    "CapaList_1" -> "Capa_1" [color=red, constraint=false];
+    "CapaList_2" [label="capa_2", shape=box, style=rounded, color=red, fontcolor=red];
+    "CapaList_2" -> "CapaList_3" [color=red];
+    "CapaList_2" -> "Capa_2" [color=red, constraint=false];
+    "CapaList_3" [label="capa_3", shape=box, style=rounded, color=red, fontcolor=red];
+    "CapaList_3" -> "Capa_3" [color=red, constraint=false];
+    "Capa_2" [label="Capa 2", shape=box, style=filled, fillcolor=lightgreen];
+    "Capa_2" -> "Capa_1";
+    "Capa_1" [label="Capa 1", shape=box, style=filled, fillcolor=lightgreen];
+    "Capa_2" -> "Capa_3";
+    "Capa_3" [label="Capa 3", shape=box, style=filled, fillcolor=lightgreen];
+}

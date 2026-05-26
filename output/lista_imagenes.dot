@@ -1,0 +1,32 @@
+digraph ListaImagenes {
+    rankdir=TB;
+    node [shape=box, style=filled, fillcolor=lightyellow];
+
+    { rank=same;
+        "Img_1" [label="Imagen 1"];
+        "Img_2" [label="Imagen 2"];
+        "Img_3" [label="Imagen 3"];
+    }
+
+    "Img_1" -> "Img_2" [dir=both];
+    "Img_2" -> "Img_3" [dir=both];
+    "Img_3" -> "Img_1" [dir=both, constraint=false];
+    "CapaImg_1_1" [label="Capa 1", shape=box, fillcolor=lightgrey];
+    "Img_1" -> "CapaImg_1_1";
+    "CapaImg_1_2" [label="Capa 2", shape=box, fillcolor=lightgrey];
+    "CapaImg_1_1" -> "CapaImg_1_2";
+    "CapaImg_1_3" [label="Capa 3", shape=box, fillcolor=lightgrey];
+    "CapaImg_1_2" -> "CapaImg_1_3";
+    "CapaImg_2_2" [label="Capa 2", shape=box, fillcolor=lightgrey];
+    "Img_2" -> "CapaImg_2_2";
+    "CapaImg_2_1" [label="Capa 1", shape=box, fillcolor=lightgrey];
+    "CapaImg_2_2" -> "CapaImg_2_1";
+    "CapaImg_2_3" [label="Capa 3", shape=box, fillcolor=lightgrey];
+    "CapaImg_2_1" -> "CapaImg_2_3";
+    "CapaImg_3_1" [label="Capa 1", shape=box, fillcolor=lightgrey];
+    "Img_3" -> "CapaImg_3_1";
+    "CapaImg_3_3" [label="Capa 3", shape=box, fillcolor=lightgrey];
+    "CapaImg_3_1" -> "CapaImg_3_3";
+    "CapaImg_3_2" [label="Capa 2", shape=box, fillcolor=lightgrey];
+    "CapaImg_3_3" -> "CapaImg_3_2";
+}

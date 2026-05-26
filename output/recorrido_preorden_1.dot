@@ -1,0 +1,7 @@
+digraph G {
+    node [shape=plaintext];
+    matriz [label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+        </TABLE>
+    >];
+}

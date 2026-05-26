@@ -1,0 +1,14 @@
+digraph ArbolUsuarios {
+    rankdir=TB;
+    "luis" [label="luis", shape=box, style=filled, fillcolor=lightblue];
+    "luis" -> "juan";
+    "juan" [label="juan", shape=box, style=filled, fillcolor=lightblue];
+    "juan" -> "ana";
+    "ana" [label="ana", shape=box, style=filled, fillcolor=lightblue];
+    "juan" -> "julia";
+    "julia" [label="julia", shape=box, style=filled, fillcolor=lightblue];
+    "luis" -> "maria";
+    "maria" [label="maria", shape=box, style=filled, fillcolor=lightblue];
+    "maria" -> "marta";
+    "marta" [label="marta", shape=box, style=filled, fillcolor=lightblue];
+}

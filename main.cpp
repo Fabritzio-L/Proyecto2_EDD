@@ -64,7 +64,7 @@ void menuReportes(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BS
 void menuCRUD(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BSTUsuarios& arbolUsuarios) {
     int opc = 0;
     do {
-        cout << "\n--- OPERACIONES CRUD (MANTENIMIENTO) ---" << endl;
+        cout << "\n--- OPERACIONES CRUD ---" << endl;
         cout << "1. Agregar Usuario" << endl;
         cout << "2. Modificar Usuario" << endl;
         cout << "3. Eliminar Usuario" << endl;
@@ -279,7 +279,7 @@ int main() {
                 menuCRUD(arbolCapas, listaImagenes, arbolUsuarios);
                 break;
             case 5:
-                cout << "Saliendo del programa. ¡Hasta pronto!" << endl;
+                cout << "Saliendo del programa..." << endl;
                 break;
             default:
                 cout << "Opcion invalida." << endl;
