@@ -1,8 +1,0 @@
-digraph ArbolCapas {
-    rankdir=TB;
-    "Capa_2" [label="Capa 2", shape=box, style=filled, fillcolor=lightgreen];
-    "Capa_2" -> "Capa_1";
-    "Capa_1" [label="Capa 1", shape=box, style=filled, fillcolor=lightgreen];
-    "Capa_2" -> "Capa_3";
-    "Capa_3" [label="Capa 3", shape=box, style=filled, fillcolor=lightgreen];
-}

@@ -136,6 +136,10 @@ public:
 
         archivo << "digraph MatrizCapa_" << idCapa << " {\n";
         archivo << "    node [shape=box, style=filled, fillcolor=white];\n";
+
+        archivo << "  splines=ortho;" << endl; 
+
+        archivo << "  nodesep=0.5;" << endl;
         archivo << "    rankdir=TB;\n"; 
 
         archivo << "    Raiz [label=\"Matriz\", fillcolor=darkgray];\n";
@@ -144,7 +148,8 @@ public:
         if (auxCol != nullptr) {
             archivo << "    Raiz -> Col_" << auxCol->indice << ";\n";
             while (auxCol != nullptr) {
-                archivo << "    Col_" << auxCol->indice << " [label=\"" << auxCol->indice << "\", fillcolor=lightgray];\n";
+                archivo << "    Col_" << auxCol->indice << " [label=\"" << auxCol->indice 
+                        << "\", fillcolor=lightgray, group=\"" << auxCol->indice << "\"];\n";
                 if (auxCol->siguiente != nullptr) {
                     archivo << "    Col_" << auxCol->indice << " -> Col_" << auxCol->siguiente->indice << ";\n";
                 }
@@ -177,7 +182,8 @@ public:
 
             while (auxNodo != nullptr) {
                 archivo << "    Nodo_" << auxNodo->fila << "_" << auxNodo->columna 
-                        << " [label=\"" << auxNodo->color << "\", fillcolor=\"" << auxNodo->color << "\"];\n";
+                        << " [label=\"" << auxNodo->color << "\", fillcolor=\"" << auxNodo->color 
+                        << "\", group=\"" << auxNodo->columna << "\"];\n";
                 
                 if (auxNodo->derecha != nullptr) {
                     archivo << "    Nodo_" << auxNodo->fila << "_" << auxNodo->columna << " -> Nodo_" << auxNodo->derecha->fila << "_" << auxNodo->derecha->columna << ";\n";

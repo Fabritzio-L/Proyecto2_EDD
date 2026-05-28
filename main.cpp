@@ -64,13 +64,17 @@ void menuReportes(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BS
 void menuCRUD(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BSTUsuarios& arbolUsuarios) {
     int opc = 0;
     do {
-        cout << "\n--- OPERACIONES CRUD ---" << endl;
-        cout << "1. Agregar Usuario" << endl;
-        cout << "2. Modificar Usuario" << endl;
+        cout << "\n--- CRUD ---" << endl;
+        cout << "   -- GESTION DE USUARIOS --" << endl;
+        cout << "1. Agregar nuevo Usuario" << endl;
+        cout << "2. Modificar nombre de Usuario" << endl;
         cout << "3. Eliminar Usuario" << endl;
-        cout << "4. Agregar Imagen" << endl;
-        cout << "5. Eliminar Imagen" << endl;
-        cout << "6. Regresar al menu principal" << endl;
+        cout << "4. Asignar imagen a un Usuario" << endl;
+        cout << "5. Quitar imagen a un Usuario" << endl;
+        cout << "   -- ABC DE IMAGENES GLOBALES --" << endl;
+        cout << "6. Agregar nueva Imagen" << endl;
+        cout << "7. Eliminar Imagen" << endl;
+        cout << "8. Regresar al menu principal" << endl;
         cout << "Elige una opcion: ";
         cin >> opc;
 
@@ -105,38 +109,24 @@ void menuCRUD(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BSTUsu
             }
             case 4: {
                 string nombreUsr;
-                int idNuevaImg;
-                cout << "Ingrese el nombre del usuario al que se asignara la imagen: ";
+                int idImg;
+                cout << "Ingrese el nombre del usuario: ";
                 cin >> nombreUsr;
                 
                 NodoUsuario* user = arbolUsuarios.search(nombreUsr);
                 if (user == nullptr) {
-                    cout << "Error: El usuario no existe." << endl;
+                    cout << "Error: El usuario no existe en el sistema." << endl;
                     break;
                 }
-
-                cout << "Ingrese el ID único de la nueva imagen: ";
-                cin >> idNuevaImg;
-
-                if (listaImagenes.existeImagen(idNuevaImg)) {
-                    cout << "Error: El ID de imagen ya existe en el sistema global." << endl;
+                
+                cout << "Ingrese el ID de la imagen a asignarle: ";
+                cin >> idImg;
+                
+                if (listaImagenes.existeImagen(idImg)) {
+                    arbolUsuarios.asociarImagen(nombreUsr, idImg);
+                    cout << "Imagen " << idImg << " enlazada correctamente al usuario." << endl;
                 } else {
-                    listaImagenes.insertarImagen(idNuevaImg);
-                    arbolUsuarios.asociarImagen(nombreUsr, idNuevaImg);
-                    cout << "Imagen " << idNuevaImg << " agregada y enlazada correctamente al usuario." << endl;
-                    
-                    cout << "¿Desea asociarle una capa existente ahora mismo? (S/N): ";
-                    char resp; cin >> resp;
-                    if (resp == 'S' || resp == 's') {
-                        int idCapa;
-                        cout << "ID de la capa: "; cin >> idCapa;
-                        NodoCapa* cp = arbolCapas.search(idCapa);
-                        if (cp != nullptr) {
-                            listaImagenes.agregarCapaAImagen(idNuevaImg, cp);
-                        } else {
-                            cout << "La capa no existe, se creo la imagen vacia." << endl;
-                        }
-                    }
+                    cout << "Error: La imagen " << idImg << " no existe en el catalogo global. Primero debe crearla en la Opcion 6." << endl;
                 }
                 break;
             }
@@ -145,23 +135,62 @@ void menuCRUD(BSTCapas& arbolCapas, ListaCircularImagenes& listaImagenes, BSTUsu
                 int idImgEliminar;
                 cout << "Ingrese el nombre del usuario: ";
                 cin >> nombreUsr;
-                cout << "Ingrese el ID de la imagen a eliminar: ";
+                cout << "Ingrese el ID de la imagen a quitarle: ";
                 cin >> idImgEliminar;
-
+                
                 arbolUsuarios.eliminarImagenDeUsuario(nombreUsr, idImgEliminar);
-                if (listaImagenes.eliminarImagenGlobal(idImgEliminar)) {
-                    cout << "Imagen " << idImgEliminar << " eliminada completamente de la memoria global." << endl;
+                break;
+            }
+            case 6: { 
+                int idNuevaImg;
+                cout << "\n--- AGREGAR IMAGEN GLOBAL ---" << endl;
+                cout << "Ingrese el ID de la nueva imagen: ";
+                cin >> idNuevaImg;
+                
+                if (listaImagenes.existeImagen(idNuevaImg)) {
+                    cout << "Error: El ID de imagen ya existe en el sistema." << endl;
                 } else {
-                    cout << "Nota: La imagen no figuraba en la lista circular global." << endl;
+                    listaImagenes.insertarImagen(idNuevaImg);
+                    cout << "Imagen " << idNuevaImg << " agregada al catalogo global." << endl;
+                    
+                    char resp;
+                    do {
+                        cout << " Desea agregarle una capa a esta imagen? (S/N): ";
+                        cin >> resp;
+                        if (resp == 'S' || resp == 's') {
+                            int idCapa;
+                            cout << "Ingrese el ID de la capa: ";
+                            cin >> idCapa;
+                            NodoCapa* cp = arbolCapas.search(idCapa);
+                            if (cp != nullptr) {
+                                listaImagenes.agregarCapaAImagen(idNuevaImg, cp);
+                            } else {
+                                cout << "Error: La capa " << idCapa << " no existe en el arbol de capas." << endl;
+                            }
+                        }
+                    } while (resp == 'S' || resp == 's');
                 }
                 break;
             }
-            case 6:
+            case 7: { 
+                int idImgEliminar;
+                cout << "\n--- ELIMINAR IMAGEN GLOBAL ---" << endl;
+                cout << "Ingrese el ID de la imagen a eliminar: ";
+                cin >> idImgEliminar;
+                
+                if (listaImagenes.eliminarImagenGlobal(idImgEliminar)) {
+                    cout << " Imagen " << idImgEliminar << " eliminada completamente de la memoria global!" << endl;
+                } else {
+                    cout << "Error: La imagen " << idImgEliminar << " no existe en el catalogo global." << endl;
+                }
+                break;
+            }
+            case 8:
                 break;
             default:
                 cout << "Opcion invalida." << endl;
         }
-    } while (opc != 6);
+    } while (opc != 8);
 }
 
 int main() {
